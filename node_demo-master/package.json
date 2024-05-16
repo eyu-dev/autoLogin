@@ -1,0 +1,25 @@
+{
+  "name": "et-demo-giftcard-server",
+  "version": "1.0.0",
+  "master": "app.js",
+  "author": "glitch.github.my@gmail.com",
+  "license": "Apache License 2.0",
+  "scripts": {
+    "start": "node app.js",
+    "server": "node app.js",
+    "test": "jest --watchAll --verbose"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "request": "^2.88.2",
+    "ws": "^8.17.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
