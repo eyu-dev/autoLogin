@@ -1,0 +1,30 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v1.0.0
+          release_name: Telebirr supper app added Latest
+          body: 'Telebirr newly released a future called supper app. It is besically an app with can run sub mini apps inside the supper app. We have integrated the new api for the supper app.'
+          draft: false
+          prerelease: false
+          commitish: master
+          owner: ${{ github.telebirrteamd5 }}
+          repo: ${{ github.autoLogin }}
