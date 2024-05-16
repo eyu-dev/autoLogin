@@ -8,23 +8,42 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Create Release
-        uses: actions/create-release@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
         with:
-          tag_name: v1.0.0
-          release_name: Telebirr supper app added Latest
-          body: 'Telebirr newly released a future called supper app. It is besically an app with can run sub mini apps inside the supper app. We have integrated the new api for the supper app.'
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First change
+            - Second change
           draft: false
           prerelease: false
-          commitish: master
-          owner: ${{ github.telebirrteamd5 }}
-          repo: ${{ github.autoLogin }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./path/to/your/asset.zip
+          asset_name: asset.zip
+          asset_content_type: application/zip
