@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "6285fce7-a89a-4064-a52a-f72f61a198e8",
+		"_postman_id": "16fcae12-dfbc-417c-9485-b166d8205a66",
 		"name": "openapi",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "34673572-16fcae12-dfbc-417c-9485-b166d8205a66"
 	},
 	"item": [
 		{
@@ -18,10 +19,12 @@
 							"    pm.environment.set(\"token\", responseBodyJson.token);\r",
 							"}"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "8cb21ddb-e64c-4747-83c4-23929c1461b4"
 					}
 				}
 			],
+			"id": "1f16c900-78b2-462a-91f8-4a286745e4c5",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -63,7 +66,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "7d5b7053-ecf8-473d-acd6-6cef673fd24c"
 					}
 				},
 				{
@@ -77,10 +81,12 @@
 							"}\r",
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "6436a3c7-ed05-4632-855e-784ed0f8681a"
 					}
 				}
 			],
+			"id": "d4ea4066-5a94-4143-9400-5473eec4a89d",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -128,10 +134,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "92e8109a-e896-4fa9-bf46-fe1470f802b7"
 					}
 				}
 			],
+			"id": "3b604b62-e8b5-4e90-b2b0-e067595f4689",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -183,7 +191,8 @@
 							"    pm.environment.set(\"prepay_id\", responseBodyJson.biz_content.prepay_id);\r",
 							"}"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "b1581c5a-2406-453a-98cb-aae0703c04bf"
 					}
 				},
 				{
@@ -192,10 +201,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "e2404041-5393-4dd2-aae9-dbe1ac5df80c"
 					}
 				}
 			],
+			"id": "33b59fe3-be3c-49dd-b5e7-273ace55be04",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -243,7 +254,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "925c452b-e684-4bac-96ad-09b8d1b4a8b3"
 					}
 				},
 				{
@@ -252,10 +264,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "3be554c1-ba1f-4775-bd77-45a273981af7"
 					}
 				}
 			],
+			"id": "bb2d85ac-7d02-451c-94b4-f180f5b8599e",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -303,10 +317,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "0770c329-0ab4-4256-a546-e3e870c5e574"
 					}
 				}
 			],
+			"id": "37d2ac60-e98e-479d-98f5-3264414e4156",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -354,10 +370,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "f0caa006-d07b-4396-825e-e4594785988e"
 					}
 				}
 			],
+			"id": "0132cf80-bc69-4605-8c53-e80806dc8de3",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -405,10 +423,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "aea9a5cd-e100-40f1-8da7-6115a052fb41"
 					}
 				}
 			],
+			"id": "fd1d87bb-a5cd-43de-b10c-0877f5556ddd",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -456,10 +476,12 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"id": "b36a9934-3049-4acf-b955-d649d908374c"
 					}
 				}
 			],
+			"id": "fa413b0a-8e03-4f70-b331-5aaad342d380",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -500,6 +522,7 @@
 		},
 		{
 			"name": "queryrefund",
+			"id": "9892ce87-4607-421a-b054-7697c5ba3faf",
 			"request": {
 				"method": "POST",
 				"header": [
