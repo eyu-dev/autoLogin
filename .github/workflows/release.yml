@@ -1,49 +1,82 @@
-name: Create Release
+name: Publish NPM
 
 on:
-  push:
-    tags:
-      - '*'
+  workflow_dispatch:
+    inputs:
+      package:
+        required: true
+        description: 'core, artifact, cache, exec, github, glob, http-client, io, tool-cache, attest'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: setup repo
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: verify package exists
+        run: ls packages/${{ github.event.inputs.package }}
+
+      - name: Set Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: 18.x
 
-      - name: Install dependencies
+      - name: npm install
         run: npm install
 
-      - name: Build
+      - name: bootstrap
+        run: npm run bootstrap
+
+      - name: build
         run: npm run build
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First change
-            - Second change
-          draft: false
-          prerelease: false
+      - name: test
+        run: npm run test
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: pack
+        run: npm pack
+        working-directory: packages/${{ github.event.inputs.package }}
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./path/to/your/asset.zip
-          asset_name: asset.zip
-          asset_content_type: application/zip
+          name: ${{ github.event.inputs.package }}
+          path: packages/${{ github.event.inputs.package }}/*.tgz
+
+  publish:
+    runs-on: ubuntu-latest 
+    needs: test
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.inputs.package }}
+
+      - name: setup authentication
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.TOKEN }}
+
+      - name: publish
+        run: npm publish --provenance *.tgz
+
+      - name: notify slack on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":":pb__failed: Failed to publish a new version of ${{ github.event.inputs.package }}"}' $SLACK_WEBHOOK
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK }}
+
+      - name: notify slack on success
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":":dance: Successfully published a new version of ${{ github.event.inputs.package }}"}' $SLACK_WEBHOOK
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK }}
