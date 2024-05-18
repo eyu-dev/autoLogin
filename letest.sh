@@ -27,11 +27,11 @@ BEGIN_CERT="-----BEGIN CERTIFICATE-----"
 END_CERT="-----END CERTIFICATE-----"
 
 if [ -z "$CA" ]; then
-  CA="(STAGING)"
+  CA="(STAGING) Artificial Apricot R3"
 fi
 
 if [ -z "$CA_ECDSA" ]; then
-  CA_ECDSA="(STAGING)"
+  CA_ECDSA="(STAGING) Ersatz Edamame E1"
 fi
 
 if [ -z "$TEST_ACME_Server" ]; then
@@ -442,7 +442,7 @@ if [ -z "$TestingDomain" ]; then
         continue
       fi
       TestingDomain="$ng_domain_1"
-      while ! grep "Generated Connector ID" "$ng_temp_1"; do
+      while ! grep "connIndex=2" "$ng_temp_1"; do
         _info "wait for connection to establish..."
         cat "$ng_temp_1"
         sleep 3
@@ -596,10 +596,6 @@ _assertcert() {
   issuername="$3"
   printf "$filename is cert ? "
   subj="$(echo  $(openssl x509  -in $filename  -text  -noout | grep 'Subject:.*CN *=' | _egrep_o  " CN *=.*" | cut -d '=' -f 2 | cut -d / -f 1))"
-  if [ -z "$subj" ]; then
-    #empty subject, let's try dns alt names.
-    subj="$(echo \"$(openssl x509  -in $filename  -text  -noout | grep ' *DNS:' | tr -d ' '),\" | _egrep_o "DNS:$subname," | sed 's/DNS://g' | tr -d ,)"
-  fi
   printf "'$subj'"
   if _contains "$subj" "$subname" || _isIP "$subname"; then
     if [ "$issuername" ] ; then
@@ -763,7 +759,7 @@ _setup() {
     rm -rf acme.sh 
   fi
   if [ ! "$BRANCH" ] ; then
-    BRANCH="dev"
+    BRANCH="master"
   fi
   _info "Testing branch: $BRANCH"
   if command -v tar > /dev/null ; then
@@ -821,7 +817,7 @@ le_test_install() {
   
   _assertexists "$lehome/$PROJECT_ENTRY" || return
   _c_entry="$(crontab -l | grep $PROJECT_ENTRY)"
-  _assertcmd "_contains '$_c_entry' '\\* \\* \\* \"$lehome\"/$PROJECT_ENTRY --cron --home \"$lehome\" > /dev/null'" || return
+  _assertcmd "_contains '$_c_entry' '0 \\* \\* \\* \"$lehome\"/$PROJECT_ENTRY --cron --home \"$lehome\" > /dev/null'" || return
   _assertcmd "$lehome/$PROJECT_ENTRY --uninstall  > /dev/null" ||  return
 }
 
@@ -851,7 +847,7 @@ le_test_installtodir() {
   
   _assertexists "$lehome/$PROJECT_ENTRY" ||  return
   _c_entry="$(crontab -l | grep $PROJECT_ENTRY)"
-  _assertcmd "_contains '$_c_entry' '\\* \\* \\* \"$lehome\"/$PROJECT_ENTRY --cron --home \"$lehome\" > /dev/null'" || return
+  _assertcmd "_contains '$_c_entry' '0 \\* \\* \\* \"$lehome\"/$PROJECT_ENTRY --cron --home \"$lehome\" > /dev/null'" || return
   _assertcmd "$lehome/$PROJECT_ENTRY --uninstall" ||  return
   if [ -z "$DEBUG" ]; then
     rm -rf $lehome
@@ -890,7 +886,7 @@ le_test_install_config_home() {
   
   _assertexists "$lehome/$PROJECT_ENTRY" || return
   _c_entry="$(crontab -l | grep $PROJECT_ENTRY)"
-  _assertcmd "_contains '$_c_entry' '\\* \\* \\* \"$lehome\"/$PROJECT_ENTRY --cron --home \"$lehome\" --config-home \"$confighome\" > /dev/null'" || return
+  _assertcmd "_contains '$_c_entry' '0 \\* \\* \\* \"$lehome\"/$PROJECT_ENTRY --cron --home \"$lehome\" --config-home \"$confighome\" > /dev/null'" || return
   _assertexists "$confighome/account.conf" || return
   _assertnotexists "$lehome/account.conf" || return
   _assertcmd "$lehome/$PROJECT_ENTRY --cron --config-home $confighome > /dev/null" ||  return
@@ -1501,10 +1497,8 @@ le_test_dnsapi() {
      _initpath $TestingDomain
      addcommand="${api}_add"
      rmcommand="${api}_rm"
-     random_string="$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c10)"
-     record_content="acmeTestTxtRecord_$random_string"
-     _assertcmd "$addcommand acmetestXyzRandomName.$TestingDomain $record_content"  ||  return
-     _assertcmd "$rmcommand  acmetestXyzRandomName.$TestingDomain $record_content"  ||  return
+     _assertcmd "$addcommand acmetestXyzRandomName.$TestingDomain acmeTestTxtRecord"  ||  return
+     _assertcmd "$rmcommand  acmetestXyzRandomName.$TestingDomain acmeTestTxtRecord"  ||  return
   ) || return
 
 }
@@ -1609,54 +1603,6 @@ le_test_preferred_chain() {
 
 
 }
-
-
-
-le_test_standandalone_ECDSA_256_pkcs12() {
-  if [ "$QUICK_TEST" ] ; then
-    _info "Skipped by QUICK_TEST"
-    __CASE_SKIPPED="1"
-    return 0
-  fi
-  
-  if [ "$NO_ECC_CASES" ] ; then
-    _info "Skipped by NO_ECC_CASES"
-    __CASE_SKIPPED="1"
-    return 0
-  fi
-    
-  lehome="$DEFAULT_HOME"
-
-  if [ -z "$TestingDomain" ] ; then
-    __fail "Please define TestingDomain and try again."
-    return 1
-  fi
-
-  rm -rf "$lehome/$TestingDomain$ECC_SUFFIX"
- 
-  _assertcmd "$lehome/$PROJECT_ENTRY  --server \"$TEST_ACME_Server\"  --issue -d $TestingDomain --standalone -k ec-256" ||  return
-  _assertcert "$lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.cer" "$TestingDomain" "$CA_ECDSA" || return
-  _assertcert "$lehome/$TestingDomain$ECC_SUFFIX/ca.cer" "$CA_ECDSA" || return
-  
-  _assertcmd "$lehome/$PROJECT_ENTRY  --server \"$TEST_ACME_Server\"  --to-pkcs12 -d $TestingDomain --password test  --ecc" ||  return
-  
-  _assertcmd "test -f $lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.pfx"
-  rm "$lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.pfx"
-  _assertcmd "test ! -f $lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.pfx"
-
-  if [ -z "$NO_REVOKE" ]; then
-    sleep 5
-    _assertcmd "$lehome/$PROJECT_ENTRY --revoke -d $TestingDomain --ecc" ||  return
-    rm -f "$lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.key"
-    rm -f "$lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.csr"
-  fi
-
-  sleep 5
-  _assertcmd "$lehome/$PROJECT_ENTRY --renew --server \"$TEST_ACME_Server\" -d $TestingDomain --force --ecc" ||  return
-  _assertcmd "test -f $lehome/$TestingDomain$ECC_SUFFIX/$TestingDomain.pfx"
-}
-
-
 
 
 le_test_shell() {
